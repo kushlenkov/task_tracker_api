@@ -23,6 +23,7 @@ public class TaskEntity {
     @Column(unique = true)
     String name;
 
+    @Builder.Default
     Instant createdAt = Instant.now();
 
     String description;

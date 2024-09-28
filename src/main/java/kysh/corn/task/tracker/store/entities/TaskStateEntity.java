@@ -5,6 +5,7 @@ import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -26,8 +27,11 @@ public class TaskStateEntity {
 
     Long ordinal;
 
+    @Builder.Default
     Instant createdAt = Instant.now();
 
+    @Builder.Default
     @OneToMany
-    List<TaskEntity> tasks;
+    @JoinColumn(name = "task_state_id", referencedColumnName = "id")
+    List<TaskEntity> tasks = new ArrayList<>();
 }

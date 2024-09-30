@@ -26,15 +26,12 @@ import java.util.stream.Stream;
 public class ProjectController {
 
     ProjectRepository projectRepository;
-
     ProjectDtoFactory projectDtoFactory;
 
     public static final String FETCH_PROJECT = "/api/projects";
-    public static final String CREATE_PROJECT = "/api/projects";
-    public static final String EDIT_PROJECT = "/api/projects/{project_id}";
+    public static final String CREATE_OR_UPDATE_PROJECT = "/api/projects";
     public static final String DELETE_PROJECT = "/api/projects/{project_id}";
 
-    public static final String CREATE_OR_UPDATE_PROJECT = "/api/projects";
 
     @GetMapping(FETCH_PROJECT)
     public List<ProjectDto> fetchProject(

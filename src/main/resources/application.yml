@@ -4,9 +4,9 @@
 
   spring:
     datasource:
-      url: jdbc:postgresql://localhost:5432/task_tracker
+      url: jdbc:postgresql://192.168.0.120:5432/task_tracker
       username: postgres
-      password: postgres
+      password: mysecretpassword
       driver-class-name: org.postgresql.Driver
     jpa:
       hibernate:

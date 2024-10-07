@@ -59,7 +59,7 @@ public class ProjectController {
             // Another params...
             ) {
 
-        optionalProjectName = optionalProjectName.filter(projectName -> !projectName.trim().isEmpty());
+        optionalProjectName = optionalProjectName.filter(projectName -> !projectName.isBlank());
 
         boolean isCreate = !optionalProjectId.isPresent();
 

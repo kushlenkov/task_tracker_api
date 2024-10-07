@@ -1,9 +1,9 @@
 package kysh.corn.task.tracker.api.controllers;
 
+import kysh.corn.task.tracker.api.controllers.helpers.ControllerHelper;
 import kysh.corn.task.tracker.api.dto.AckDto;
 import kysh.corn.task.tracker.api.dto.ProjectDto;
 import kysh.corn.task.tracker.api.exceptions.BadRequestException;
-import kysh.corn.task.tracker.api.exceptions.NotFoundException;
 import kysh.corn.task.tracker.api.factories.ProjectDtoFactory;
 import kysh.corn.task.tracker.store.entities.ProjectEntity;
 import kysh.corn.task.tracker.store.repositories.ProjectRepository;
@@ -26,7 +26,10 @@ import java.util.stream.Stream;
 public class ProjectController {
 
     ProjectRepository projectRepository;
+
     ProjectDtoFactory projectDtoFactory;
+
+    ControllerHelper controllerHelper;
 
     public static final String FETCH_PROJECT = "/api/projects";
     public static final String CREATE_OR_UPDATE_PROJECT = "/api/projects";
@@ -65,7 +68,7 @@ public class ProjectController {
         }
 
         final ProjectEntity project = optionalProjectId
-                .map(this::getProjectOrThrowException)
+                .map(controllerHelper::getProjectOrThrowException)
                 .orElseGet(() -> ProjectEntity.builder().build());
 
         optionalProjectName
@@ -91,23 +94,10 @@ public class ProjectController {
     @DeleteMapping(DELETE_PROJECT)
     public AckDto deleteProject(@PathVariable("project_id") Long projectId) {
 
-        getProjectOrThrowException(projectId);
+        controllerHelper.getProjectOrThrowException(projectId);
 
         projectRepository.deleteById(projectId);
 
         return AckDto.makeDefault(true);
-    }
-
-    private ProjectEntity getProjectOrThrowException(Long projectId) {
-        return projectRepository
-                .findById(projectId)
-                .orElseThrow(() ->
-                        new NotFoundException(
-                                String.format(
-                                        "Project with this Id \"%s\" doesn't exist.",
-                                        projectId
-                                )
-                        )
-                );
     }
 }

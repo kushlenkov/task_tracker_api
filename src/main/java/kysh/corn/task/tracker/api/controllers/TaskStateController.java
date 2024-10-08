@@ -30,6 +30,7 @@ public class TaskStateController {
 
     public static final String GET_TASK_STATES = "/api/projects/{project_id}/task-states";
     public static final String CREATE_TASK_STATE = "/api/projects/{project_id}/task-states";
+    public static final String UPDATE_TASK_STATE = "/api/projects/{project_id}/task-states";
     public static final String DELETE_PROJECT = "/api/projects/{project_id}";
 
     @GetMapping(GET_TASK_STATES)
@@ -65,10 +66,29 @@ public class TaskStateController {
                     throw new BadRequestException(String.format("Task state \"%s\" already exists.", taskStateName));
                 });
 
-        TaskStateEntity taskState = taskStateRepository
-                .saveAndFlush(
+        //TODO
 
-                )
+        TaskStateEntity taskState = taskStateRepository.saveAndFlush(
+                TaskStateEntity.builder()
+                        .name(taskStateName)
+                        .project(project)
+                        .build()
+        );
 
+        taskStateRepository
+                .findTaskStateEntityByRightTaskStateIdIsNullAndProjectId(projectId)
+                .ifPresent(anotherTaskState -> {
+
+                    taskState.setLeftTaskState(anotherTaskState);
+
+                    anotherTaskState.setRightTaskState(taskState);
+
+                    taskStateRepository.saveAndFlush(anotherTaskState);
+                });
+
+
+        final TaskStateEntity savedTaskState = taskStateRepository.saveAndFlush(taskState);
+
+        return taskStateDtoFactory.makeTaskStateDto(savedTaskState);
     }
 }

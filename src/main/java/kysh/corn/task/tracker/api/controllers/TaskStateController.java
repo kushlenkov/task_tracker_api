@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -56,17 +58,19 @@ public class TaskStateController {
 
         ProjectEntity project = controllerHelper.getProjectOrThrowException(projectId);
 
-        project
-                .getTaskStates()
-                .stream()
-                .map(TaskStateEntity::getName)
-                .filter(anotherTaskStateName -> anotherTaskStateName.equals(taskStateName))
-                .findAny()
-                .ifPresent(it -> {
-                    throw new BadRequestException(String.format("Task state \"%s\" already exists.", taskStateName));
-                });
+        Optional<TaskStateEntity> optionalAnotherTaskState = Optional.empty();
 
-        //TODO
+        for (TaskStateEntity taskState : project.getTaskStates()) {
+
+            if (taskState.getName().equalsIgnoreCase(taskStateName)) {
+                throw new BadRequestException(String.format("Task state \"%s\" already exists.", taskStateName));
+            }
+
+            if (Objects.isNull(taskState.getRightTaskState())) {
+                optionalAnotherTaskState = Optional.of(taskState);
+                break;
+            }
+        }
 
         TaskStateEntity taskState = taskStateRepository.saveAndFlush(
                 TaskStateEntity.builder()
@@ -75,8 +79,7 @@ public class TaskStateController {
                         .build()
         );
 
-        taskStateRepository
-                .findTaskStateEntityByRightTaskStateIdIsNullAndProjectId(projectId)
+        optionalAnotherTaskState
                 .ifPresent(anotherTaskState -> {
 
                     taskState.setLeftTaskState(anotherTaskState);
